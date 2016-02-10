@@ -8,9 +8,11 @@
 
 #import "PhotoChooserViewController.h"
 #import "ResultsViewController.h"
+#import "ImageProcessing.h"
 
 @interface PhotoChooserViewController ()
 @property (nonatomic, strong) UIImage *selectedImage;
+@property (nonatomic) int threshold;
 @end
 
 @implementation PhotoChooserViewController
@@ -33,12 +35,25 @@
     
     // Show process button
     if (self.selectedImage) {
+        
+        // Shrink the image. Tesseract works better with smaller images than what the iPhone puts out.
+        CGSize newSize = CGSizeMake(self.selectedImage.size.width / 3, self.selectedImage.size.height / 3);
+        UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+        [self.selectedImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+        UIImage *resizedImage = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+        
+        self.selectedImage = resizedImage;
+        
         UIBarButtonItem *barButton = [[UIBarButtonItem alloc] initWithTitle:@"Process"
                                                                       style:UIBarButtonItemStylePlain
                                                                      target:self
                                                                      action:@selector(processWasPressed:)];
         [self.navigationItem setRightBarButtonItem:barButton animated:YES];
         [self.selectedImageView setImage:self.selectedImage];
+        
+        self.threshold = 80;
+        [self.thresholdField setText:[NSString stringWithFormat:@"%d", self.threshold]];
     }
     
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -63,6 +78,7 @@
     [activityView startAnimating];
     
     resultsVC.selectedImage = self.selectedImage;
+    resultsVC.threshold = self.threshold;
     [resultsVC.selectedImageView setImage:self.selectedImage];
     
     // Push
@@ -85,6 +101,28 @@
     [self presentViewController:imagePickerController
                        animated:YES
                      completion:nil];
+}
+
+- (IBAction)thresholdInc:(id)sender {
+    self.threshold += 10;
+    [self.thresholdField setText:[NSString stringWithFormat:@"%d", self.threshold]];
+    [self updateImage];
+}
+
+- (IBAction)thresholdDec:(id)sender {
+    self.threshold -= 10;
+    [self.thresholdField setText:[NSString stringWithFormat:@"%d", self.threshold]];
+    [self updateImage];
+}
+
+
+- (void)updateImage {
+    ImageWrapper *greyScale=Image::createImage(self.selectedImage, self.selectedImage.size.width, self.selectedImage.size.height, false);
+    ImageWrapper *edges = greyScale.image->fixedThreshold(self.threshold);
+    
+    UIImage *processedImage = edges.image->toUIImage();
+    [self.selectedImageView setImage:processedImage];
+    
 }
 
 @end

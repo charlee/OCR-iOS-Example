@@ -11,6 +11,11 @@
 @interface PhotoChooserViewController : UIViewController <UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIImageView *selectedImageView;
+@property (weak, nonatomic) IBOutlet UISlider *thresholdSlider;
+@property (weak, nonatomic) IBOutlet UILabel *thresholdField;
+
 - (IBAction)choosePhotoWasTapped:(id)sender;
+- (IBAction)thresholdInc:(id)sender;
+- (IBAction)thresholdDec:(id)sender;
 
 @end

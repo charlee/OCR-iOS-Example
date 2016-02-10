@@ -13,6 +13,7 @@
 @property (nonatomic, strong) UIView *loadingView;
 
 @property (weak, nonatomic) UIImage *selectedImage;
+@property (nonatomic) int threshold;
 @property (weak, nonatomic) IBOutlet UIImageView *selectedImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *processedImageView;
 @property (weak, nonatomic) IBOutlet UITextView *resultsTextView;

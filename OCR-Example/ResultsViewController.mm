@@ -34,16 +34,16 @@
 {
     [super viewDidAppear:animated];
     
-    // Shrink the image. Tesseract works better with smaller images than what the iPhone puts out.
-    CGSize newSize = CGSizeMake(self.selectedImage.size.width / 3, self.selectedImage.size.height / 3);
-    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
-    [self.selectedImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-    UIImage *resizedImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
+//    // Shrink the image. Tesseract works better with smaller images than what the iPhone puts out.
+//    CGSize newSize = CGSizeMake(self.selectedImage.size.width / 3, self.selectedImage.size.height / 3);
+//    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+//    [self.selectedImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+//    UIImage *resizedImage = UIGraphicsGetImageFromCurrentImageContext();
+//    UIGraphicsEndImageContext();
     
     
-    ImageWrapper *greyScale=Image::createImage(resizedImage, resizedImage.size.width, resizedImage.size.height);
-    ImageWrapper *edges = greyScale.image->fixedThreshold(80);
+    ImageWrapper *greyScale=Image::createImage(self.selectedImage, self.selectedImage.size.width, self.selectedImage.size.height);
+    ImageWrapper *edges = greyScale.image->fixedThreshold(self.threshold);
     
     UIImage *processedImage = edges.image->toUIImage();
     [self.processedImageView setImage:processedImage];
