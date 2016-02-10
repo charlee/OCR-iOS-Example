@@ -34,6 +34,21 @@
 {
     [super viewDidAppear:animated];
     
+    // Shrink the image. Tesseract works better with smaller images than what the iPhone puts out.
+    CGSize newSize = CGSizeMake(self.selectedImage.size.width / 3, self.selectedImage.size.height / 3);
+    UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+    [self.selectedImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+    UIImage *resizedImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    
+    ImageWrapper *greyScale=Image::createImage(resizedImage, resizedImage.size.width, resizedImage.size.height);
+    ImageWrapper *edges = greyScale.image->fixedThreshold(80);
+    
+    UIImage *processedImage = edges.image->toUIImage();
+    [self.processedImageView setImage:processedImage];
+
+    
     // Process the image.
     // Ideally, this shouldn't happen everytime the view appears but its a
     // sample.
@@ -41,19 +56,9 @@
         __block Tesseract* tesseract = [[Tesseract alloc] initWithDataPath:@"/tessdata" language:@"eng"];
         
         // Uncomment to only search for alpha-numeric characters.
-        [tesseract setVariableValue:@"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" forKey:@"tessedit_char_whitelist"];
+        [tesseract setVariableValue:@"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ/-," forKey:@"tessedit_char_whitelist"];
         
-        // Shrink the image. Tesseract works better with smaller images than what the iPhone puts out.
-        CGSize newSize = CGSizeMake(self.selectedImage.size.width / 3, self.selectedImage.size.height / 3);
-        UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
-        [self.selectedImage drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
-        UIImage *resizedImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-        
-        ImageWrapper *greyScale=Image::createImage(resizedImage, resizedImage.size.width, resizedImage.size.height);        
-        ImageWrapper *edges = greyScale.image->autoLocalThreshold();
-        
-        [tesseract setImage:edges.image->toUIImage()];
+        [tesseract setImage:processedImage];
         [tesseract recognize];
         
         dispatch_async(dispatch_get_main_queue(), ^{

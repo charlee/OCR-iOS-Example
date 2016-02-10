@@ -69,6 +69,7 @@ public:
     ImageWrapper *autoIntegratingThreshold();
     // threshold an image automatically
     ImageWrapper *autoThreshold();
+    ImageWrapper* fixedThreshold(int threshold);
     // gaussian smooth the image
     ImageWrapper *gaussianBlur();
     // get the percent set pixels

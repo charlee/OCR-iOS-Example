@@ -14,6 +14,7 @@
 
 @property (weak, nonatomic) UIImage *selectedImage;
 @property (weak, nonatomic) IBOutlet UIImageView *selectedImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *processedImageView;
 @property (weak, nonatomic) IBOutlet UITextView *resultsTextView;
 
 @end

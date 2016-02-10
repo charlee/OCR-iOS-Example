@@ -223,6 +223,18 @@ ImageWrapper* Image::autoLocalThreshold() {
     return Image::createImage(result, m_width, m_height, true);
 }
 
+ImageWrapper* Image::fixedThreshold(int threshold) {
+    uint8_t *result = (uint8_t*) malloc(m_width * m_height);
+    for (int index = 0; index < m_width * m_height; index++) {
+        if (m_imageData[index] > threshold) {
+            result[index] = 0;
+        } else {
+            result[index] = 255;
+        }
+    }
+    return Image::createImage(result, m_width, m_height, true);
+}
+
 ImageWrapper *Image::autoThreshold() {
     int total=0;
     int count=0;
